@@ -29,7 +29,7 @@ module.exports = {
       options: {
         configPath: `src/config`,
         docsPath: `src/docs`,
-        githubUrl: `https://github.com/awconway/nur1027syllabus`,
+        githubUrl: `https://github.com/awconway/nur1027-syllabus`,
         baseDir: ``,
       },
     },
