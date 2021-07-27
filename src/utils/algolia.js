@@ -1,40 +1,44 @@
-const escapeStringRegexp = require("escape-string-regexp");
-const pagePath = `/src/docs/`;
-const indexName = `nur1027`;
+const config = require('../../config.js');
+
 const pageQuery = `{
-  pages: allMdx(
-    filter: {
-      fileAbsolutePath: { regex: "/${escapeStringRegexp(pagePath)}/" },
-    }
-  ) {
+  pages: allMdx {
     edges {
       node {
-        id
-        frontmatter {
-          title
-        }
+        objectID: id
         fields {
           slug
         }
-        excerpt(pruneLength: 5000)
+        headings {
+          value
+        }
+        frontmatter {
+          title
+          metaDescription 
+        }
+        excerpt(pruneLength: 50000)
       }
     }
   }
 }`;
-function pageToAlgoliaRecord({ node: { id, frontmatter, fields, ...rest } }) {
-  return {
-    objectID: id,
+
+const flatten = arr =>
+  arr.map(({ node: { frontmatter, fields, ...rest } }) => ({
     ...frontmatter,
     ...fields,
     ...rest,
-  };
-}
+  }));
+
+const settings = { attributesToSnippet: [`excerpt:20`] };
+
+const indexName = config.header.search ? config.header.search.indexName : '';
+
 const queries = [
   {
     query: pageQuery,
-    transformer: ({ data }) => data.pages.edges.map(pageToAlgoliaRecord),
-    indexName,
-    settings: { attributesToSnippet: [`excerpt:20`] },
+    transformer: ({ data }) => flatten(data.pages.edges),
+    indexName: `${indexName}`,
+    settings,
   },
 ];
+
 module.exports = queries;
